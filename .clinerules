@@ -186,7 +186,7 @@ feature(reviews): ドキュメントレビュー承認機能を追加
    ```sh
    gh pr create \
    --base development \
-   --head "$current_branch" \
+   --head "$(git branch --show-current)" \
    --title "[コミットタイプ] 変更内容の要約" \
    --body <body>
    ```
