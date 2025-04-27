@@ -1,0 +1,13 @@
+feat(weather): OpenWeatherMap APIによる今日の天気予報取得機能を追加
+
+- OpenWeatherMap APIを利用し、今日の天気予報を取得するGoプログラムをsrc/weather_today.goに新規作成
+- APIキーや都市名は環境変数（OPENWEATHER_API_KEY, WEATHER_CITY）から取得し、セキュリティベストプラクティスを遵守
+- エラーハンドリング、詳細なコメント、ユーザーフレンドリーな出力を実装
+
+## プロンプト履歴
+
+1. Q: openweatherのapiを用いて、今日の天気予報を取得するコードをgo
+   A: src/weather_today.goにAPIキーを環境変数から取得し天気予報を取得するGoコードを新規作成
+
+2. Q: PRを作成して
+   A: コミットメッセージを作成し、PR作成コマンドを提示
