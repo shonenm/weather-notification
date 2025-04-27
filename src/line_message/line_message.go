@@ -32,12 +32,12 @@ func getEnvVars() (string, string, error) {
 	}
 
 	token := os.Getenv("LINE_CHANNEL_ACCESS_TOKEN")
-	userID := os.Getenv("LINE_USER_ID")
+	userID := os.Getenv("MY_USER_ID")
 	if token == "" {
 		return "", "", errors.New("環境変数 LINE_CHANNEL_ACCESS_TOKEN が設定されていません")
 	}
 	if userID == "" {
-		return "", "", errors.New("環境変数 LINE_USER_ID が設定されていません")
+		return "", "", errors.New("環境変数 MY_USER_ID が設定されていません")
 	}
 	return token, userID, nil
 }
@@ -86,9 +86,19 @@ func main() {
 		log.Fatalf("環境変数取得エラー: %v", err)
 	}
 
-	message := "こんにちは！これはLINE Messaging APIから送信されたテストメッセージです。"
-	if err := sendLineMessage(token, userID, message); err != nil {
-		log.Fatalf("メッセージ送信エラー: %v", err)
+	// ここでrain_infoを定義する（本来は天気予報APIの結果を受け取る想定）
+	rainInfo := "今日は傘を持ちましょう。\n"
+
+	// 送りたいテキスト
+	finalText := "今日は雨が降りそうです！傘を忘れずに！"
+
+	// 雨の情報がある場合だけ送信
+	if rainInfo == "今日は傘を持ちましょう。\n" {
+		if err := sendLineMessage(token, userID, finalText); err != nil {
+			log.Fatalf("メッセージ送信エラー: %v", err)
+		}
+		fmt.Println("メッセージ送信に成功しました。")
+	} else {
+		fmt.Println("今日は傘の必要はなさそうです。メッセージは送信しません。")
 	}
-	fmt.Println("メッセージ送信に成功しました。")
 }
