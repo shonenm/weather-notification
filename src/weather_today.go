@@ -14,6 +14,8 @@ import (
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/joho/godotenv"
 )
 
 // OpenWeatherMap APIのレスポンス構造体
@@ -32,6 +34,15 @@ type WeatherResponse struct {
 
 // 環境変数からAPIキーと都市名を取得
 func getEnvVars() (string, string, error) {
+	// ログの設定
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+
+	// .envファイルを読み込む
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf(".envファイルの読み込みに失敗しました: %v", err)
+	}
+
 	apiKey := os.Getenv("OPENWEATHER_API_KEY")
 	city := os.Getenv("WEATHER_CITY")
 	if apiKey == "" {
