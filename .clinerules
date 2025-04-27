@@ -102,6 +102,7 @@
 
 ### 3. コミットメッセージの例
 
+```text
 feature(reviews): ドキュメントレビュー承認機能を追加
 
 - レビュー承認ワークフローを実装
@@ -115,6 +116,7 @@ feature(reviews): ドキュメントレビュー承認機能を追加
 
 2. Q: 投稿履歴の追加もお願いします
    A: 投稿履歴の追跡機能を実装し、履歴データの保存と表示機能を追加
+```
 
 ### コミットメッセージコマンドの制限事項
 
@@ -175,23 +177,31 @@ feature(reviews): ドキュメントレビュー承認機能を追加
 
 #### 4. gh コマンドの使用
 
-## 現在のブランチ名を取得
+1. 現在のブランチ名を取得
 
-current_branch=$(git branch --show-current)
+   current_branch=$(git branch --show-current)
 
-## プルリクエスト作成コマンド
+2. プルリクエスト作成コマンド
 
-gh pr create \
- --base development \
- --head "$current_branch" \
- --title "[コミットタイプ] 変更内容の要約" \
- --body "## 変更内容
+   ```sh
+   gh pr create \
+   --base development \
+   --head "$current_branch" \
+   --title "[コミットタイプ] 変更内容の要約" \
+   --body <body>
+   ```
 
-- 変更点 1
-- 変更点 2
-- 変更点 3
+   body は以下の通り
 
-### 変更の背景・目的
+   ```text
+   ## 変更内容
 
-- 背景の説明
-- 目的の説明"
+   - 変更点 1
+   - 変更点 2
+   - 変更点 3
+
+   ## 変更の背景・目的
+
+   - 背景の説明
+   - 目的の説明
+   ```
