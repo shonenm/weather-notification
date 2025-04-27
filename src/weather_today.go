@@ -19,17 +19,21 @@ import (
 )
 
 // OpenWeatherMap APIのレスポンス構造体
-type WeatherResponse struct {
-	Weather []struct {
-		Main        string `json:"main"`
-		Description string `json:"description"`
-	} `json:"weather"`
-	Main struct {
-		Temp     float64 `json:"temp"`
-		Humidity int     `json:"humidity"`
-	} `json:"main"`
-	Name string `json:"name"`
-	Dt   int64  `json:"dt"`
+type ForecastResponse struct {
+	List []struct {
+		Dt   int64 `json:"dt"`
+		Main struct {
+			Temp     float64 `json:"temp"`
+			Humidity int     `json:"humidity"`
+		} `json:"main"`
+		Weather []struct {
+			Main        string `json:"main"`
+			Description string `json:"description"`
+		} `json:"weather"`
+	} `json:"list"`
+	City struct {
+		Name string `json:"name"`
+	} `json:"city"`
 }
 
 // 環境変数からAPIキーと都市名を取得
@@ -55,10 +59,10 @@ func getEnvVars() (string, string, error) {
 }
 
 // OpenWeatherMap APIから天気情報を取得
-func fetchWeather(apiKey, city string) (*WeatherResponse, error) {
+func fetchWeather(apiKey, city string) (*ForecastResponse, error) {
 	// APIエンドポイント
 	url := fmt.Sprintf(
-		"https://api.openweathermap.org/data/2.5/weather?q=%s&appid=%s&lang=ja&units=metric",
+		"https://api.openweathermap.org/data/2.5/forecast?q=%s&appid=%s&lang=ja&units=metric",
 		city, apiKey,
 	)
 
@@ -73,15 +77,20 @@ func fetchWeather(apiKey, city string) (*WeatherResponse, error) {
 		return nil, fmt.Errorf("APIエラー: %s, レスポンス: %s", resp.Status, string(body))
 	}
 
-	var weather WeatherResponse
+	var weather ForecastResponse
 	if err := json.NewDecoder(resp.Body).Decode(&weather); err != nil {
 		return nil, fmt.Errorf("レスポンスのデコードに失敗しました: %w", err)
 	}
+
+
+	if len(weather.List) == 0 {
+		return nil, errors.New("天気予報のリストが空です")
+	}
+	
 	return &weather, nil
 }
 
 func main() {
-	// ログの設定
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
 	apiKey, city, err := getEnvVars()
@@ -89,19 +98,36 @@ func main() {
 		log.Fatalf("環境変数取得エラー: %v", err)
 	}
 
-	weather, err := fetchWeather(apiKey, city)
+	forecast, err := fetchWeather(apiKey, city)
 	if err != nil {
 		log.Fatalf("天気情報取得エラー: %v", err)
 	}
 
-	// 日付を日本時間で表示
+	// JSTで今日の日付を取得
 	jst := time.FixedZone("Asia/Tokyo", 9*60*60)
-	date := time.Unix(weather.Dt, 0).In(jst).Format("2006-01-02 15:04")
+	now := time.Now().In(jst)
+	today := now.Format("2006-01-02")
 
-	fmt.Printf("【%s の天気予報 (%s)】\n", weather.Name, date)
-	if len(weather.Weather) > 0 {
-		fmt.Printf("天気: %s (%s)\n", weather.Weather[0].Main, weather.Weather[0].Description)
+	fmt.Printf("【%s の本日(%s)3時間ごとの天気予報】\n", forecast.City.Name, today)
+
+	horizon := now.Add(24 * time.Hour)
+
+	fmt.Printf("【%s のこれから24時間の天気予報】\n", forecast.City.Name)
+
+	found := false
+	for _, entry := range forecast.List {
+		entryTime := time.Unix(entry.Dt, 0).In(jst)
+		if entryTime.After(now) && entryTime.Before(horizon) {
+			found = true
+			fmt.Printf("\n[%s]\n", entryTime.Format("01/02 15:04"))
+			if len(entry.Weather) > 0 {
+				fmt.Printf("天気: %s (%s)\n", entry.Weather[0].Main, entry.Weather[0].Description)
+			}
+			fmt.Printf("気温: %.1f℃\n", entry.Main.Temp)
+			fmt.Printf("湿度: %d%%\n", entry.Main.Humidity)
+		}
 	}
-	fmt.Printf("気温: %.1f℃\n", weather.Main.Temp)
-	fmt.Printf("湿度: %d%%\n", weather.Main.Humidity)
+	if !found {
+		fmt.Println("これから24時間の天気予報データが見つかりませんでした。")
+	}
 }
