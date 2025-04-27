@@ -36,8 +36,8 @@ type ForecastResponse struct {
 	} `json:"city"`
 }
 
-// 環境変数からAPIキーと都市名を取得
-func getEnvVars() (string, string, error) {
+// 環境変数からAPIキーと緯度・経度を取得
+func getEnvVars() (string, string, string, error) {
 	// ログの設定
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
@@ -48,22 +48,25 @@ func getEnvVars() (string, string, error) {
 	}
 
 	apiKey := os.Getenv("OPENWEATHER_API_KEY")
-	city := os.Getenv("WEATHER_CITY")
+	lat := os.Getenv("WEATHER_LAT")
+	lon := os.Getenv("WEATHER_LON")
 	if apiKey == "" {
-		return "", "", errors.New("環境変数 OPENWEATHER_API_KEY が設定されていません")
+		return "", "", "", errors.New("環境変数 OPENWEATHER_API_KEY が設定されていません")
 	}
-	if city == "" {
-		return "", "", errors.New("環境変数 WEATHER_CITY が設定されていません")
+	if lat == "" {
+		return "", "", "", errors.New("環境変数 WEATHER_LAT が設定されていません")
 	}
-	return apiKey, city, nil
+	if lon == "" {
+		return "", "", "", errors.New("環境変数 WEATHER_LON が設定されていません")
+	}
+	return apiKey, lat, lon, nil
 }
 
-// OpenWeatherMap APIから天気情報を取得
-func fetchWeather(apiKey, city string) (*ForecastResponse, error) {
-	// APIエンドポイント
+// OpenWeatherMap APIから天気情報を取得（緯度・経度指定）
+func fetchWeather(apiKey, lat, lon string) (*ForecastResponse, error) {
 	url := fmt.Sprintf(
-		"https://api.openweathermap.org/data/2.5/forecast?q=%s&appid=%s&lang=ja&units=metric",
-		city, apiKey,
+		"https://api.openweathermap.org/data/2.5/forecast?lat=%s&lon=%s&appid=%s&lang=ja&units=metric",
+		lat, lon, apiKey,
 	)
 
 	resp, err := http.Get(url)
@@ -82,23 +85,21 @@ func fetchWeather(apiKey, city string) (*ForecastResponse, error) {
 		return nil, fmt.Errorf("レスポンスのデコードに失敗しました: %w", err)
 	}
 
-
 	if len(weather.List) == 0 {
 		return nil, errors.New("天気予報のリストが空です")
 	}
-	
 	return &weather, nil
 }
 
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
-	apiKey, city, err := getEnvVars()
+	apiKey, lat, lon, err := getEnvVars()
 	if err != nil {
 		log.Fatalf("環境変数取得エラー: %v", err)
 	}
 
-	forecast, err := fetchWeather(apiKey, city)
+	forecast, err := fetchWeather(apiKey, lat, lon)
 	if err != nil {
 		log.Fatalf("天気情報取得エラー: %v", err)
 	}
