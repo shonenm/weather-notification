@@ -134,3 +134,8 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# local development
+.history/*
+devcontainer.local.json
+docker-compose.override.yml
