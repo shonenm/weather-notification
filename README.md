@@ -64,3 +64,9 @@ export WEATHER_LON=139.759455
 export LINE_CHANNEL_ACCESS_TOKEN=あなたのチャネルアクセストークン
 export MY_USER_ID=あなたのLINEユーザーID
 ```
+
+## 参考
+
+- [cline](https://zenn.dev/codeciao/articles/6d0a83e234a34a)
+- [line-bot](https://qiita.com/nkjm/items/38808bbc97d6927837cd)
+- [railway](https://zenn.dev/k2o_system/articles/bc192236721163)
