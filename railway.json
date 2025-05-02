@@ -1,0 +1,9 @@
+{
+  "build": {
+    "builder": "NIXPACKS",
+    "buildCommand": "go build -o app ./src"
+  },
+  "deploy": {
+    "startCommand": "./app"
+  }
+}
