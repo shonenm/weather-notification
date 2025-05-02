@@ -4,6 +4,13 @@
     "buildCommand": "go build -o app ./src"
   },
   "deploy": {
-    "startCommand": "./app"
+    "startCommand": "./app",
+    "envVars": {
+      "OPENWEATHER_API_KEY": "OPENWEATHER_API_KEY",
+      "WEATHER_LAT": "WEATHER_LAT",
+      "WEATHER_LON": "WEATHER_LON",
+      "LINE_CHANNEL_ACCESS_TOKEN": "LINE_CHANNEL_ACCESS_TOKEN",
+      "MY_USER_ID": "MY_USER_ID"
+    }
   }
 }
