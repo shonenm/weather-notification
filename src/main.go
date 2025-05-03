@@ -1,4 +1,3 @@
-// main.go
 package main
 
 import (
@@ -28,16 +27,19 @@ func main() {
 		log.Fatalf("天気情報取得エラー: %v", err)
 	}
 
-	// 雨が降るか判定
+	// 傘が必要か判定
 	needUmbrella, rainMessage := weather.NeedUmbrella(forecast)
 
+	var message string
 	if needUmbrella {
-		// 雨情報を送信
-		if err := line.SendTextMessage(token, userID, rainMessage); err != nil {
-			log.Fatalf("LINEメッセージ送信エラー: %v", err)
-		}
-		fmt.Println("雨予報メッセージをLINEに送信しました。")
+		message = rainMessage
 	} else {
-		fmt.Println("今日は傘の必要はなさそうです。LINE送信はしません。")
+		message = "今日は傘の必要はなさそうです☀️"
 	}
+
+	// メッセージを送信
+	if err := line.SendTextMessage(token, userID, message); err != nil {
+		log.Fatalf("LINEメッセージ送信エラー: %v", err)
+	}
+	fmt.Println("天気通知をLINEに送信しました。")
 }
